@@ -1,7 +1,7 @@
 <template>
   <div class="whackamole">
     <h1 class="logo">Whack-a-mole!</h1>
-    <button class="start-game">Start Game</button>
+    <button class="start-game" v-on:click="startGame">Start Game</button>
     <Board v-bind:board-props="boardProps"></Board>
     <GameScreen v-bind:mole-states="moleStates" v-bind:is-game-active="isGameActive"></GameScreen>
   </div>
@@ -12,6 +12,25 @@ import { v1 } from "uuid";
 import Board from "./components/Board.vue";
 import GameScreen from "./components/GameScreen.vue";
 
+const GAME_INTERVAL = 5;
+
+const initialData = () => {
+  const moleStates = {};
+  for (let i = 0; i < 4; i += 1) {
+    const id = v1();
+    moleStates[id] = { id: id, active: false };
+  }
+
+  return {
+    score: 0,
+    highScore: 0,
+    time: GAME_INTERVAL,
+    timer: null,
+    moleStates: moleStates,
+    isGameActive: false
+  };
+};
+
 export default {
   name: "App",
   components: {
@@ -19,19 +38,7 @@ export default {
     GameScreen
   },
   data: function() {
-    const moleStates = {};
-    for (let i = 0; i < 4; i += 1) {
-      const id = v1();
-      moleStates[id] = { id: id, active: false };
-    }
-
-    return {
-      score: 0,
-      highScore: 0,
-      time: 0,
-      moleStates: moleStates,
-      isGameActive: true
-    };
+    return initialData();
   },
   computed: {
     boardProps: function() {
@@ -40,6 +47,36 @@ export default {
         { label: "High Score", value: this.highScore },
         { label: "Timer", value: this.time }
       ];
+    }
+  },
+  methods: {
+    resetState: function() {
+      const data = initialData();
+      Object.keys(data).forEach(key => {
+        this[key] = data[key];
+      });
+    },
+    startGame: function() {
+      this.resetState();
+      this.isGameActive = true;
+      this.startTimer();
+    },
+    endGame: function() {
+      this.isGameActive = false;
+      this.endTimer();
+    },
+    startTimer: function() {
+      this.timer = setInterval(() => {
+        this.time -= 1;
+        if (this.time <= 0) {
+          this.endTimer();
+        }
+      }, 1000);
+    },
+    endTimer: function() {
+      if (this.timer) {
+        clearInterval(this.timer);
+      }
     }
   }
 };
