@@ -1,11 +1,6 @@
 <template>
-  <div v-bind:class="{ molesContainer: true, gameActive: isGameActive }">
-    <div class="mole-container inactive">
-      <div class="mole-image-container">
-        <img class="mole" src="../assets/mole.png" alt="mole">
-      </div>
-      <img class="dirt" src="../assets/dirt.svg" alt="mole dirt">
-    </div>
+  <div v-bind:class="{ 'moles-container': true, 'game-active': isGameActive }">
+    <Mole v-for="moleId in moleIds" v-bind:mole-state="moleStates[moleId]" v-bind:key="moleId"></Mole>
   </div>
 </template>
 
@@ -21,56 +16,24 @@
 .moles-container.game-active {
   opacity: 1;
 }
-
-.mole-container {
-  width: 160px;
-  height: 160px;
-  display: inline-block;
-  margin: 10px;
-  position: relative;
-}
-
-.mole-image-container {
-  overflow: hidden;
-  width: 160px;
-  height: 140px;
-}
-
-.mole-container img {
-  display: block;
-  transition: all 0.3s ease;
-}
-
-.mole {
-  position: relative;
-  width: 60%;
-  margin: auto;
-  cursor: pointer;
-}
-
-.mole-container.active .mole {
-  /* display: block; */
-  top: 0px;
-}
-
-.mole-container.inactive .mole {
-  top: 200px;
-}
-
-.dirt {
-  width: 100%;
-  margin: auto;
-  z-index: 1;
-  position: absolute;
-  bottom: 0;
-}
 </style>
 
 <script>
+import Mole from "./Mole.vue";
+
 export default {
   name: "GameScreen",
+  components: {
+    Mole
+  },
   props: {
-    isGameActive: Boolean
+    isGameActive: Boolean,
+    moleStates: Object
+  },
+  computed: {
+    moleIds: function() {
+      return Object.keys(this.moleStates);
+    }
   }
 };
 </script>

@@ -3,11 +3,12 @@
     <h1 class="logo">Whack-a-mole!</h1>
     <button class="start-game">Start Game</button>
     <Board v-bind:board-props="boardProps"></Board>
-    <GameScreen></GameScreen>
+    <GameScreen v-bind:mole-states="moleStates" v-bind:is-game-active="isGameActive"></GameScreen>
   </div>
 </template>
 
 <script>
+import { v1 } from "uuid";
 import Board from "./components/Board.vue";
 import GameScreen from "./components/GameScreen.vue";
 
@@ -18,10 +19,18 @@ export default {
     GameScreen
   },
   data: function() {
+    const moleStates = {};
+    for (let i = 0; i < 4; i += 1) {
+      const id = v1();
+      moleStates[id] = { id: id, active: false };
+    }
+
     return {
       score: 0,
       highScore: 0,
-      time: 0
+      time: 0,
+      moleStates: moleStates,
+      isGameActive: true
     };
   },
   computed: {
