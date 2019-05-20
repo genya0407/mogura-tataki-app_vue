@@ -2,20 +2,7 @@
   <div class="whackamole">
     <h1 class="logo">Whack-a-mole!</h1>
     <button class="start-game">Start Game</button>
-    <div class="counters-container">
-      <div class="counter">
-        <h2>Score:</h2>
-        <h1>0</h1>
-      </div>
-      <div class="counter">
-        <h2>High Score:</h2>
-        <h1>0</h1>
-      </div>
-      <div class="counter">
-        <h2>Timer:</h2>
-        <h1>0</h1>
-      </div>
-    </div>
+    <Board v-bind:board-props="boardProps"></Board>
     <div class="moles-container gameActive">
       <div class="mole-container inactive">
         <div class="mole-image-container">
@@ -46,8 +33,29 @@
 </template>
 
 <script>
+import Board from "./components/Board.vue";
+
 export default {
-  name: "App"
+  name: "App",
+  components: {
+    Board
+  },
+  data: function() {
+    return {
+      score: 0,
+      highScore: 0,
+      time: 0
+    };
+  },
+  computed: {
+    boardProps: function() {
+      return [
+        { label: "Score", value: this.score },
+        { label: "High Score", value: this.highScore },
+        { label: "Timer", value: this.time }
+      ];
+    }
+  }
 };
 </script>
 
@@ -68,22 +76,6 @@ export default {
   color: #fff;
   font-size: 1em;
   cursor: pointer;
-}
-
-.counters-container {
-  display: flex;
-  justify-content: space-evenly;
-}
-
-.counter {
-  border: 1px solid #000;
-  margin-top: 20px;
-  padding: 20px;
-}
-
-.counter h1,
-.counter h2 {
-  margin: 0;
 }
 
 .moles-container {
