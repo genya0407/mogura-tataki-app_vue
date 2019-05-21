@@ -3,7 +3,11 @@
     <h1 class="logo">Whack-a-mole!</h1>
     <button class="start-game" v-on:click="startGame">Start Game</button>
     <Board v-bind:board-props="boardProps"></Board>
-    <GameScreen v-bind:mole-states="moleStates" v-bind:is-game-active="isGameActive"></GameScreen>
+    <GameScreen
+      v-bind:mole-states="gameState.moleStates"
+      v-bind:is-game-active="gameState.isGameActive"
+      v-on:mole-clicked="moleClickedHandler"
+    ></GameScreen>
   </div>
 </template>
 
@@ -12,9 +16,10 @@ import { v1 } from "uuid";
 import Board from "./components/Board.vue";
 import GameScreen from "./components/GameScreen.vue";
 
-const GAME_INTERVAL = 5;
+const GAME_TIME_SECONDS = 3; // secs
+const MOLE_ACTIVATE_INTERVAL = 500; // ms
 
-const initialData = () => {
+const initialGameState = () => {
   const moleStates = {};
   for (let i = 0; i < 4; i += 1) {
     const id = v1();
@@ -23,13 +28,22 @@ const initialData = () => {
 
   return {
     score: 0,
-    highScore: 0,
-    time: GAME_INTERVAL,
-    timer: null,
+    time: GAME_TIME_SECONDS,
+    gameTimer: null,
+    moleTimer: null,
     moleStates: moleStates,
     isGameActive: false
   };
 };
+
+const initialData = () => {
+  return {
+    highScore: 0,
+    gameState: initialGameState()
+  };
+};
+
+const pickOne = arr => arr[Math.floor(Math.random() * arr.length)];
 
 export default {
   name: "App",
@@ -43,40 +57,64 @@ export default {
   computed: {
     boardProps: function() {
       return [
-        { label: "Score", value: this.score },
+        { label: "Score", value: this.gameState.score },
         { label: "High Score", value: this.highScore },
-        { label: "Timer", value: this.time }
+        { label: "Timer", value: this.gameState.time }
       ];
     }
   },
   methods: {
-    resetState: function() {
-      const data = initialData();
-      Object.keys(data).forEach(key => {
-        this[key] = data[key];
-      });
+    resetGameState: function() {
+      this.gameState = initialGameState();
     },
     startGame: function() {
-      this.resetState();
-      this.isGameActive = true;
+      this.resetGameState();
+      this.gameState.isGameActive = true;
       this.startTimer();
+      this.startMole();
     },
     endGame: function() {
-      this.isGameActive = false;
+      this.gameState.isGameActive = false;
+      this.endMole();
       this.endTimer();
+      this.updateHighScore();
+    },
+    updateHighScore: function() {
+      if (this.highScore < this.gameState.score) {
+        this.highScore = this.gameState.score;
+      }
     },
     startTimer: function() {
-      this.timer = setInterval(() => {
-        this.time -= 1;
-        if (this.time <= 0) {
-          this.endTimer();
+      this.gameState.gameTimer = setInterval(() => {
+        this.gameState.time -= 1;
+        if (this.gameState.time <= 0) {
+          this.endGame();
         }
       }, 1000);
     },
     endTimer: function() {
-      if (this.timer) {
-        clearInterval(this.timer);
+      if (this.gameState.gameTimer) {
+        clearInterval(this.gameState.gameTimer);
       }
+    },
+    startMole: function() {
+      this.gameState.moleTimer = setInterval(
+        () => this.activateRandomMole(),
+        MOLE_ACTIVATE_INTERVAL
+      );
+    },
+    endMole: function() {
+      if (this.gameState.moleTimer) {
+        clearInterval(this.gameState.moleTimer);
+      }
+    },
+    activateRandomMole: function() {
+      const moleId = pickOne(Object.keys(this.gameState.moleStates));
+      this.gameState.moleStates[moleId].active = true;
+    },
+    moleClickedHandler: function(moleId) {
+      this.gameState.moleStates[moleId].active = false;
+      this.gameState.score += 1;
     }
   }
 };

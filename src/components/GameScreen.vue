@@ -1,6 +1,11 @@
 <template>
   <div v-bind:class="{ 'moles-container': true, 'game-active': isGameActive }">
-    <Mole v-for="moleId in moleIds" v-bind:mole-state="moleStates[moleId]" v-bind:key="moleId"></Mole>
+    <Mole
+      v-for="moleId in moleIds"
+      v-bind:mole-state="moleStates[moleId]"
+      v-bind:key="moleId"
+      v-on:mole-clicked="propagateMoleClickedEvent"
+    ></Mole>
   </div>
 </template>
 
@@ -28,11 +33,19 @@ export default {
   },
   props: {
     isGameActive: Boolean,
-    moleStates: Object
+    moleStates: Object,
+    moleClickedHandler: Function
   },
   computed: {
     moleIds: function() {
       return Object.keys(this.moleStates);
+    }
+  },
+  methods: {
+    propagateMoleClickedEvent: function(moleId) {
+      if (this.isGameActive) {
+        this.$emit("mole-clicked", moleId);
+      }
     }
   }
 };
