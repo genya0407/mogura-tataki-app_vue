@@ -16,7 +16,7 @@ import { v1 } from "uuid";
 import Board from "./components/Board.vue";
 import GameScreen from "./components/GameScreen.vue";
 
-const GAME_TIME_SECONDS = 20; // secs
+const GAME_TIME_SECONDS = 3; // secs
 const MOLE_ACTIVATE_INTERVAL = 500; // ms
 
 const initialGameState = () => {
@@ -27,6 +27,7 @@ const initialGameState = () => {
   }
 
   return {
+    score: 0,
     time: GAME_TIME_SECONDS,
     gameTimer: null,
     moleTimer: null,
@@ -37,7 +38,6 @@ const initialGameState = () => {
 
 const initialData = () => {
   return {
-    score: 0,
     highScore: 0,
     gameState: initialGameState()
   };
@@ -57,19 +57,18 @@ export default {
   computed: {
     boardProps: function() {
       return [
-        { label: "Score", value: this.score },
+        { label: "Score", value: this.gameState.score },
         { label: "High Score", value: this.highScore },
         { label: "Timer", value: this.gameState.time }
       ];
     }
   },
   methods: {
-    resetState: function() {
-      this.endGame();
+    resetGameState: function() {
       this.gameState = initialGameState();
     },
     startGame: function() {
-      this.resetState();
+      this.resetGameState();
       this.gameState.isGameActive = true;
       this.startTimer();
       this.startMole();
@@ -78,6 +77,12 @@ export default {
       this.gameState.isGameActive = false;
       this.endMole();
       this.endTimer();
+      this.updateHighScore();
+    },
+    updateHighScore: function() {
+      if (this.highScore < this.gameState.score) {
+        this.highScore = this.gameState.score;
+      }
     },
     startTimer: function() {
       this.gameState.gameTimer = setInterval(() => {
@@ -108,8 +113,8 @@ export default {
       this.gameState.moleStates[moleId].active = true;
     },
     moleClickedHandler: function(moleId) {
-      console.log(moleId);
       this.gameState.moleStates[moleId].active = false;
+      this.gameState.score += 1;
     }
   }
 };

@@ -43,7 +43,9 @@ export default {
   },
   methods: {
     propagateMoleClickedEvent: function(moleId) {
-      this.$emit("mole-clicked", moleId);
+      if (this.isGameActive) {
+        this.$emit("mole-clicked", moleId);
+      }
     }
   }
 };
