@@ -1,7 +1,7 @@
 <template>
-  <div v-bind:class="{ 'mole-container': true, inactive: !moleState.isActive }">
+  <div v-bind:class="{ 'mole-container': true, inactive: !moleState.active }">
     <div class="mole-image-container">
-      <img class="mole" src="../assets/mole.png" alt="mole">
+      <img class="mole" src="../assets/mole.png" alt="mole" v-on:click="propagateMoleClickedEvent">
     </div>
     <img class="dirt" src="../assets/dirt.svg" alt="mole dirt">
   </div>
@@ -12,6 +12,11 @@ export default {
   name: "Mole",
   props: {
     moleState: Object
+  },
+  methods: {
+    propagateMoleClickedEvent: function() {
+      this.$emit("mole-clicked", this.moleState.id);
+    }
   }
 };
 </script>

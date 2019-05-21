@@ -6,6 +6,7 @@
     <GameScreen
       v-bind:mole-states="gameState.moleStates"
       v-bind:is-game-active="gameState.isGameActive"
+      v-on:mole-clicked="moleClickedHandler"
     ></GameScreen>
   </div>
 </template>
@@ -105,6 +106,10 @@ export default {
     activateRandomMole: function() {
       const moleId = pickOne(Object.keys(this.gameState.moleStates));
       this.gameState.moleStates[moleId].active = true;
+    },
+    moleClickedHandler: function(moleId) {
+      console.log(moleId);
+      this.gameState.moleStates[moleId].active = false;
     }
   }
 };
