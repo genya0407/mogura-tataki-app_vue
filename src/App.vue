@@ -12,7 +12,7 @@ import { v1 } from "uuid";
 import Board from "./components/Board.vue";
 import GameScreen from "./components/GameScreen.vue";
 
-const GAME_INTERVAL = 5;
+const GAME_INTERVAL = 20;
 
 const initialData = () => {
   const moleStates = {};
@@ -59,21 +59,15 @@ export default {
     startGame: function() {
       this.resetState();
       this.isGameActive = true;
-      this.startTimer();
-    },
-    endGame: function() {
-      this.isGameActive = false;
-      this.endTimer();
-    },
-    startTimer: function() {
       this.timer = setInterval(() => {
         this.time -= 1;
         if (this.time <= 0) {
-          this.endTimer();
+          this.endGame();
         }
       }, 1000);
     },
-    endTimer: function() {
+    endGame: function() {
+      this.isGameActive = false;
       if (this.timer) {
         clearInterval(this.timer);
       }
